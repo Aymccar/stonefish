@@ -40,6 +40,7 @@ SimpleThruster::SimpleThruster(std::string uniqueName, SolidEntity* propeller, b
     inv = inverted;
     theta = Scalar(0);
     thrust = Scalar(0);
+    sThrust = Scalar(0);
     torque = Scalar(0);
     setThrustLimits(1, -1); // No limits
     
