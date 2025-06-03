@@ -53,6 +53,7 @@
 #include "sensors/scalar/GPS.h"
 #include "sensors/scalar/INS.h"
 #include "sensors/scalar/Compass.h"
+#include "sensors/scalar/SimpleMagnetometer.h"
 #include "sensors/scalar/Odometry.h"
 #include "sensors/scalar/Pressure.h"
 #include "sensors/scalar/RotaryEncoder.h"
@@ -3651,6 +3652,35 @@ Sensor* ScenarioParser::ParseSensor(XMLElement* element, const std::string& name
                 log.Print(MessageType::WARNING, "Noise of sensor '%s' not properly defined - using defaults.", sensorName.c_str());
         }
         sens = compass;
+    }
+    else if (typeStr == "simple_magnetometer")
+    {
+        int history;
+        if((item = element->FirstChildElement("history")) == nullptr || item->QueryAttribute("samples", &history) != XML_SUCCESS)
+            history = -1;
+
+        SimpleMagnetometer* magnetometer = new SimpleMagnetometer(sensorName, rate, history);
+
+        //Optional noise definition
+        if((item = element->FirstChildElement("noise")) != nullptr)
+        {
+            const char* mag_noise_str = nullptr;
+            Vector3 mag_noise = V0();
+            int c = 0;
+
+            // TODO s/magnetometer/field_density
+            if (item->QueryStringAttribute("magnetometer", &mag_noise_str) == XML_SUCCESS
+                && ParseVector(mag_noise_str, mag_noise))
+            {
+                magnetometer->setNoise(mag_noise);
+            }
+            else
+            {
+                log.Print(MessageType::WARNING, "Noise of sensor '%s' not properly defined - using defaults.", sensorName.c_str());
+            }
+        }
+
+        sens = magnetometer;
     }
     else if(typeStr == "profiler")
     {
