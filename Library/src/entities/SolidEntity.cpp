@@ -1636,7 +1636,7 @@ void SolidEntity::ComputeHydrodynamicForcesSurface(const HydrodynamicsSettings& 
             if(vc_n < -1e-12f) //If liquid is approaching the surface
             {
                 GLfloat vmag2 = glm::length2(vc);
-                glm::vec3 quadratic = vc * sqrtf(vmag2) * -vc_n * A;
+                glm::vec3 quadratic = vc * sqrtf(glm::max(0.0f, vmag2)) * -vc_n * A;
                 Fdq += quadratic;
                 Tdq += glm::cross(fc - p, quadratic);
             }
